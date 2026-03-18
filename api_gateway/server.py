@@ -157,8 +157,13 @@ async def halo_request(
             raise RuntimeError(f"Request failed: {e}")
 
 
-def format_response(result: Any, max_items: int = 10) -> str:
-    """Format API response for display."""
+def format_response(result: Any, max_items: int = 0) -> str:
+    """Format API response for display.
+
+    Args:
+        result: The API response data.
+        max_items: Maximum items to display. 0 = no limit (return all items).
+    """
     if isinstance(result, dict):
         record_count = result.get('record_count', None)
         list_key = None
@@ -171,7 +176,7 @@ def format_response(result: Any, max_items: int = 10) -> str:
 
         if list_data is not None:
             total = record_count if record_count is not None else len(list_data)
-            if len(list_data) > max_items:
+            if max_items > 0 and len(list_data) > max_items:
                 truncated = json.dumps(list_data[:max_items], indent=2)
                 return f"Retrieved {total} items. Showing first {max_items}:\n\n{truncated}\n\n({total} total items)"
             else:
@@ -180,7 +185,7 @@ def format_response(result: Any, max_items: int = 10) -> str:
         return json.dumps(result, indent=2)
 
     elif isinstance(result, list):
-        if len(result) > max_items:
+        if max_items > 0 and len(result) > max_items:
             return f"Retrieved {len(result)} items. Showing first {max_items}:\n\n{json.dumps(result[:max_items], indent=2)}"
         return json.dumps(result, indent=2)
 
