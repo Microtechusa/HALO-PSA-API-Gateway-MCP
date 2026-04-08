@@ -79,7 +79,7 @@ def setup_config():
     logger.info(f"  SCOPE:     {HALO_SCOPE}")
 
     if not all([HALO_BASE_URL, HALO_CLIENT_ID, HALO_CLIENT_SECRET]):
-        logger.warning("HaloPSA configuration incomplete \u2014 API calls will fail until env vars are set.")
+        logger.warning("HaloPSA configuration incomplete — API calls will fail until env vars are set.")
         return False
     return True
 
@@ -157,13 +157,8 @@ async def halo_request(
             raise RuntimeError(f"Request failed: {e}")
 
 
-def format_response(result: Any, max_items: int = 0) -> str:
-    """Format API response for display.
-
-    Args:
-        result: The API response data.
-        max_items: Maximum items to display. 0 = no limit (return all items).
-    """
+def format_response(result: Any) -> str:
+    """Format API response for display. Always returns ALL items with no truncation."""
     if isinstance(result, dict):
         record_count = result.get('record_count', None)
         list_key = None
@@ -176,18 +171,12 @@ def format_response(result: Any, max_items: int = 0) -> str:
 
         if list_data is not None:
             total = record_count if record_count is not None else len(list_data)
-            if max_items > 0 and len(list_data) > max_items:
-                truncated = json.dumps(list_data[:max_items], indent=2)
-                return f"Retrieved {total} items. Showing first {max_items}:\n\n{truncated}\n\n({total} total items)"
-            else:
-                return f"Retrieved {total} items:\n\n{json.dumps(list_data, indent=2)}"
+            return f"Retrieved {total} items:\n\n{json.dumps(list_data, indent=2)}"
 
         return json.dumps(result, indent=2)
 
     elif isinstance(result, list):
-        if max_items > 0 and len(result) > max_items:
-            return f"Retrieved {len(result)} items. Showing first {max_items}:\n\n{json.dumps(result[:max_items], indent=2)}"
-        return json.dumps(result, indent=2)
+        return f"Retrieved {len(result)} items:\n\n{json.dumps(result, indent=2)}"
 
     return json.dumps(result, indent=2)
 
@@ -222,7 +211,7 @@ def check_fast_memory(path: str, method: str):
 
 
 # ============================================================
-# MCP TOOLS \u2014 Smart High-Level Tools
+# MCP TOOLS — Smart High-Level Tools
 # ============================================================
 
 @mcp.tool()
@@ -571,7 +560,7 @@ async def search_invoices(
 
 
 # ============================================================
-# MCP TOOLS \u2014 Generic / Power-User Tools
+# MCP TOOLS — Generic / Power-User Tools
 # ============================================================
 
 @mcp.tool()
@@ -588,7 +577,7 @@ async def execute_api_call(
         endpoint: API endpoint path (e.g. /Tickets, /Client/123, /Actions)
         method: HTTP method (GET, POST, DELETE)
         params: Query parameters dict
-        data: Request body (for POST \u2014 should be a list of objects per HaloPSA convention)
+        data: Request body (for POST — should be a list of objects per HaloPSA convention)
     """
     global current_query_from_fast_memory
 
@@ -660,7 +649,7 @@ async def send_raw_api_request(raw_request: str) -> str:
 
 
 # ============================================================
-# MCP TOOLS \u2014 Endpoint Reference
+# MCP TOOLS — Endpoint Reference
 # ============================================================
 
 @mcp.tool()
@@ -687,7 +676,7 @@ async def get_endpoint_details(resource: str) -> str:
 
 
 # ============================================================
-# MCP TOOLS \u2014 Fast Memory
+# MCP TOOLS — Fast Memory
 # ============================================================
 
 @mcp.tool()
